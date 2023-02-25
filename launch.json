@@ -1,0 +1,9 @@
+{
+    "type": "node",
+    "request": "launch",
+    "name": "Debug Program",
+    "cwd": "${workspaceFolder}",
+    "runtimeExecutable":"npm",
+    "runtimeArgs":["run","start:debug"],
+    "autoAttachChildProcesses":true
+}
