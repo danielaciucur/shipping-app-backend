@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { Parcel } from './parcels/models/parcel.entity';
+import * as typeOrmConfig from './typeorm.config';
 import { ParcelsModule } from './parcels/parcels.module';
 
 @Module({
