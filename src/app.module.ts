@@ -8,13 +8,7 @@ import { ParcelsModule } from './parcels/parcels.module';
 @Module({
   imports: [
     ParcelsModule,
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      url: process.env.DATABASE_URL,
-      autoLoadEntities: true,
-      synchronize: true,
-      entities: [Parcel]
-    }),
+    TypeOrmModule.forRoot(typeOrmConfig),
   ],
   controllers: [AppController],
   providers: [AppService],
