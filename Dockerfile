@@ -4,7 +4,7 @@ FROM node:18-alpine AS install-dependencies
 
 WORKDIR /daniela/src/app
 
-RUN npm install -g npm@9.5.0
+RUN npm install
 
 COPY package.json package-lock.json ./
 
@@ -19,7 +19,7 @@ FROM node:18-alpine AS create-build
 
 WORKDIR /daniela/src/app
 
-RUN npm install -g npm@9.5.0
+RUN npm install
 
 COPY --from=install-dependencies /daniela/src/app ./
 
@@ -34,7 +34,7 @@ FROM node:18-alpine AS run
 
 WORKDIR /daniela/src/app
 
-RUN npm install -g npm@9.5.0
+RUN npm install
 
 COPY --from=install-dependencies /daniela/src/app/node_modules ./node_modules
 COPY --from=create-build /daniela/src/app/dist ./dist
