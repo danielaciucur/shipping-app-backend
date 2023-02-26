@@ -1,27 +1,45 @@
-# Specify Node Version and Image
-FROM node:16.16.0 AS development
+# Installing dependencies:
 
-# Specify the working dir
+FROM node:18-alpine AS install-dependencies
+
 WORKDIR /daniela/src/app
 
-COPY package*.json ./
-COPY tsconfig.build.json ./
-COPY tsconfig.json ./
+RUN npm install -g npm@9.5.0
+
+COPY package.json package-lock.json ./
 
 RUN npm ci
-RUN npm run build
 
-EXPOSE 3000
+COPY . .
 
-FROM node:16.16.0 as production
 
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
+# Creating a build:
+
+FROM node:18-alpine AS create-build
 
 WORKDIR /daniela/src/app
 
-COPY --from=development /daniela/src/app/ .
+RUN npm install -g npm@9.5.0
 
-EXPOSE 3000
+COPY --from=install-dependencies /daniela/src/app ./
 
-CMD ["node", "dist/main" ]
+RUN npm run build
+
+USER node
+
+
+# Running the application:
+
+FROM node:18-alpine AS run
+
+WORKDIR /daniela/src/app
+
+RUN npm install -g npm@9.5.0
+
+COPY --from=install-dependencies /daniela/src/app/node_modules ./node_modules
+COPY --from=create-build /daniela/src/app/dist ./dist
+COPY package.json ./
+
+RUN npm prune --production
+
+CMD ["npm", "run", "start:prod"]
