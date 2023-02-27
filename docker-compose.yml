@@ -1,0 +1,57 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: danielaciucur
+      POSTGRES_PASSWORD: Cristina1991!
+      POSTGRES_DB: db
+    ports:
+      - 5432:5432
+    container_name: postgres-db
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+
+  # Angular Shipping App Frontend
+  frontend:
+    container_name: shipping-app-frontend
+    build:
+      dockerfile: Dockerfile
+      context: ./shipping-app-frontend
+    command: ng serve --host 0.0.0.0 --poll=2000
+    volumes:
+      - ./shipping-app-frontend:/daniela/shipping-app-frontend/src/app
+      - /daniela/shipping-app-frontend/src/app/node_modules
+    ports:
+      - "4200:4200"
+    depends_on:
+      - api
+
+  # NestJS Shipping App Backend
+  api:
+    container_name: shipping-app-backend
+    build:
+      dockerfile: Dockerfile
+      context: ./shipping-app-backend
+    volumes:
+      - ./shipping-app-backend:/daniela/src/app
+      - /daniela/src/app/node_modules
+    # dev mode: npm run start:dev / debug: npm run start:debug
+    command: npm run start:dev
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=user
+      - DB_PASSWORD=password
+      - DB_NAME=db
+    ports:
+      - "3000:3000"
+    links:
+      - db
+volumes:
+  pgdata:
+  pgadmin-data:
