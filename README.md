@@ -26,10 +26,12 @@
 
 Backend Application written in NestJS.
 
-## Installation
+## Local Installation
 
 ```bash
 $ npm install
+
+You need a local postgresql database running
 ```
 
 ## Running the app
