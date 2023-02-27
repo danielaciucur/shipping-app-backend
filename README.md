@@ -31,10 +31,30 @@ Backend Application written in NestJS.
 ```bash
 $ npm install
 
-You need a local postgresql database running
+This Project is now dockerized.  
+We have one Dockerfile for the api (NestJS) and one for the frontend(Angular).  
+On the top file level there is a `docker-compose.yml` file that you can start, there is also the database and everything configured.  So you don't need to do anything else than run `docker-compose up`.
 ```
 
-## Running the app
+## Running the app with docker
+
+Command:  
+`docker-compose up`  
+and then visit `localhost:4200`
+
+### Tipps & Tricks for docker
+If you need to remove docker images or containers you can use one of the following commands.
+
+Command to remove all images:  
+`docker rmi -f $(docker images -a -q)`
+
+Command to remove all containers:  
+`docker rm -vf $(docker ps -a -q)`
+
+
+## Running the app without docker
+
+You will need a local postgres installation for this. 
 
 ```bash
 # development
