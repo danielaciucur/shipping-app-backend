@@ -5,14 +5,14 @@ services:
     image: postgres
     restart: always
     environment:
-      POSTGRES_USER: danielaciucur
-      POSTGRES_PASSWORD: Cristina1991!
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: db
     ports:
       - 5432:5432
     container_name: postgres-db
     volumes:
-      - ./pgdata:/var/lib/postgresql/data
+      - db:/var/lib/postgresql/data
 
   # Angular Shipping App Frontend
   frontend:
@@ -45,13 +45,12 @@ services:
     environment:
       - DB_HOST=db
       - DB_PORT=5432
-      - DB_USER=user
-      - DB_PASSWORD=password
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
       - DB_NAME=db
     ports:
       - "3000:3000"
     links:
       - db
 volumes:
-  pgdata:
-  pgadmin-data:
+  db:
