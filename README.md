@@ -54,7 +54,7 @@ Command to remove all containers:
 
 ## Running the app without docker
 
-You will need a local postgres installation for this. 
+You will need a local postgres installation for this. Afterwards runs:
 
 ```bash
 # development
