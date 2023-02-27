@@ -29,11 +29,11 @@ export class ParcelsService {
         'parcel.country',
         'parcel.town',
         'parcel.state',
-        'parcel.deliveryDate',
+        'parcel.deliverydate',
       ])
       .orderBy({
         "CASE WHEN parcel.country = 'Estonia' THEN parcel.country END": 'DESC',
-        'parcel.deliveryDate': 'ASC',
+        'parcel.deliverydate': 'ASC',
       })
       .getMany();
     return paginate<Parcel>(queryBuilder, options);

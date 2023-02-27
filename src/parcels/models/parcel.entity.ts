@@ -23,8 +23,8 @@ export class Parcel {
   @Column({ nullable: true })
   country?: string;
 
-  @Column({ type: 'datetime', nullable: true })
-  deliveryDate?: Date;
+  @Column({ type: 'timestamp', nullable: true })
+  deliverydate?: string;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
   constructor(_init?: Partial<Parcel>) {}
