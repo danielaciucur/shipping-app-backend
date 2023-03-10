@@ -8,7 +8,7 @@ import {
   Query,
 } from '@nestjs/common';
 /* import { Pagination } from 'nestjs-typeorm-paginate';*/
-import { Observable } from 'rxjs';
+import { from, Observable } from 'rxjs';
 import { CreateParcelDto } from './models/dto/create-parcel.dto';
 import { ParcelResponse } from './models/parcel-response';
 import { Parcel } from './models/parcel.entity';
@@ -20,15 +20,15 @@ export class ParcelsController {
   constructor(private parcelService: ParcelsService) {}
 
   @Get()
-  async index(
+  index(
     @Query('page') page = 1,
     @Query('limit') limit = 10,
     @Query('description') description: string,
     @Query('country') country: string,
-  ): Promise<ParcelResponse> {
+  ): Observable<ParcelResponse> {
     limit = limit > 100 ? 100 : limit;
 
-    return await this.parcelService.paginate(
+    return this.parcelService.paginate(
       page,
       limit,
       new SearchFilter(country, description),
@@ -52,8 +52,8 @@ export class ParcelsController {
   } */
 
   @Post('create')
-  async create(@Body() createParcelDto: CreateParcelDto): Promise<Parcel> {
-    return this.parcelService.createParcel(createParcelDto);
+  create(@Body() createParcelDto: CreateParcelDto): Observable<Parcel> {
+    return from(this.parcelService.createParcel(createParcelDto));
   }
 
   @Delete('/delete/:id')

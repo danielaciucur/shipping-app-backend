@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
   Pagination,
   IPaginationOptions,
 } from 'nestjs-typeorm-paginate'; */
-import { from, Observable } from 'rxjs';
+import { from, map, Observable, switchMap, throwError } from 'rxjs';
 import { Repository } from 'typeorm';
 import { CreateParcelDto } from './models/dto/create-parcel.dto';
 import { ParcelResponse } from './models/parcel-response';
@@ -19,11 +19,11 @@ export class ParcelsService {
     private parcelRepository: Repository<Parcel>,
   ) {}
 
-  async paginate(
+  paginate(
     page = 1,
     limit = 10,
     filter?: SearchFilter,
-  ): Promise<ParcelResponse> {
+  ): Observable<ParcelResponse> {
     const queryBuilder = this.parcelRepository.createQueryBuilder('parcel');
 
     if (filter != null) {
@@ -40,19 +40,32 @@ export class ParcelsService {
       }
     }
 
-    const [data, total] = await queryBuilder
+    /*     const [data, total] = await queryBuilder
       .orderBy(
         `CASE WHEN country = 'Estonia' THEN 1 ELSE 2 END, deliveryDate`,
         'ASC',
       )
       .skip((page - 1) * limit)
       .take(limit)
-      .getManyAndCount();
+      .getManyAndCount(); */
 
-    const currentPage = page;
-    const totalPages = Math.ceil(total / limit);
+    return from(
+      queryBuilder
+        .orderBy(
+          `CASE WHEN country = 'Estonia' THEN 1 ELSE 2 END, deliveryDate`,
+          'ASC',
+        )
+        .skip((page - 1) * limit)
+        .take(limit)
+        .getManyAndCount(),
+    ).pipe(
+      map(([data, total]) => {
+        const currentPage = page;
+        const totalPages = Math.ceil(total / limit);
 
-    return new ParcelResponse(data, total, currentPage, totalPages);
+        return new ParcelResponse(data, total, currentPage, totalPages);
+      }),
+    );
   }
 
   /* async paginate(
@@ -88,8 +101,28 @@ export class ParcelsService {
     return from(this.parcelRepository.findOneBy({ uuid }));
   }
 
-  async createParcel(createParcelDto: CreateParcelDto): Promise<Parcel> {
-    const existingParcel = await this.parcelRepository.findOne({
+  createParcel(createParcelDto: CreateParcelDto): Observable<Parcel> {
+    return from(
+      this.parcelRepository.findOne({
+        where: { parcelSKU: createParcelDto.parcelSKU },
+      }),
+    ).pipe(
+      switchMap((existingParcel) => {
+        if (existingParcel) {
+          return throwError(
+            () =>
+              new HttpException(
+                'Parcel SKU already exists',
+                HttpStatus.BAD_REQUEST,
+              ),
+          );
+        } else {
+          return from(this.parcelRepository.save(createParcelDto));
+        }
+      }),
+    );
+
+    /* const existingParcel = await this.parcelRepository.findOne({
       where: { parcelSKU: createParcelDto.parcelSKU },
     });
 
@@ -100,7 +133,7 @@ export class ParcelsService {
       );
     }
 
-    return this.parcelRepository.save(createParcelDto);
+    return this.parcelRepository.save(createParcelDto); */
   }
 
   removeParcel(uuid: string): Observable<any> {
